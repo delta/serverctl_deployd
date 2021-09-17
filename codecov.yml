@@ -1,0 +1,7 @@
+ignore:
+  - "tests/*"
+coverage:
+  status:
+    project:
+      default:
+        target: 90

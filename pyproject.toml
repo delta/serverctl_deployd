@@ -1,0 +1,32 @@
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-v"
+testpaths = [
+    "tests"
+]
+norecursedirs = [
+    "venv"
+]
+
+[tool.coverage.run]
+omit = [
+    "venv/*",
+    "tests/*"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+  "if __name__ == .__main__.:",
+]
+
+[tool.mypy]
+strict = true
+pretty = true
+html_report = "htmlmypy"
+exclude = "venv"
+
+[[tool.mypy.overrides]]
+module = [
+    "uvicorn"
+]
+ignore_missing_imports = true
