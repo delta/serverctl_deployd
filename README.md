@@ -22,8 +22,7 @@
 4. Run `source ./venv/bin/activate`
 5. Run `pip install -r requirements-dev.txt`
 6. Run `pre-commit install` to install the git hooks for linting and testing
-7. Run `mkdir logs` to create the log directory
-8. Run `uvicorn serverctl_deployd.main:app --reload` to start the server
+7. Run `uvicorn serverctl_deployd.main:app --reload` to start the server
 
 
 ## License
