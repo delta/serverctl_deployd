@@ -14,7 +14,7 @@ from serverctl_deployd.config import Settings
 from serverctl_deployd.dependencies import check_authentication
 from serverctl_deployd.routers import config, deployments, docker
 
-rotating_file_handler = TimedRotatingFileHandler("serverctl_deployd.log",
+rotating_file_handler = TimedRotatingFileHandler("logs/serverctl_deployd.log",
                                                  when="W0",
                                                  backupCount=48,
                                                  utc=True)
