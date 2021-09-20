@@ -24,7 +24,6 @@
 6. Run `pre-commit install` to install the git hooks for linting and testing
 7. Run `uvicorn serverctl_deployd.main:app --reload` to start the server
 
-
 ## License
 
 MIT License
