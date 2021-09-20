@@ -4,30 +4,26 @@ Entrypoint for the API.
 
 import json
 import logging
-import os
 import sys
 from logging.handlers import TimedRotatingFileHandler
 
 import uvicorn
-from dotenv import load_dotenv
 from fastapi import Depends, FastAPI
 
 from serverctl_deployd.config import Settings
 from serverctl_deployd.dependencies import check_authentication
 from serverctl_deployd.routers import config, deployments, docker
 
-load_dotenv(dotenv_path=".env")
-
 rotating_file_handler = TimedRotatingFileHandler("serverctl_deployd.log",
                                                  when="W0",
                                                  backupCount=48,
                                                  utc=True)
 
-logging.basicConfig(level=os.environ.get("LOGLEVEL", "WARNING").upper(),
+settings = Settings()
+logging.basicConfig(level=settings.log_level,
                     format="%(asctime)s %(levelname)s: %(message)s",
                     handlers=[logging.StreamHandler(sys.stdout), rotating_file_handler])
 
-settings = Settings()
 app: FastAPI = FastAPI(dependencies=[Depends(check_authentication)])
 
 
