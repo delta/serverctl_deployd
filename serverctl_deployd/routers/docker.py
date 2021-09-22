@@ -20,21 +20,21 @@ router = APIRouter(
 
 
 @router.get(
-    "/containers/{digest}/attach",
+    "/containers/{container_id}/attach",
     responses={
         status.HTTP_404_NOT_FOUND: {"model": GenericError},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": GenericError}
     }
 )
 async def container_attach(
-    digest: str,
+    container_id: str,
     docker_client: DockerClient = Depends(get_docker_client)
 ) -> StreamingResponse:
     """
     Returns a HTTP Stream for the container's stdout and stderr
     """
     try:
-        container: Container = docker_client.containers.get(digest)
+        container: Container = docker_client.containers.get(container_id)
         log_stream: CancellableStream = container.attach(stream=True)
     except NotFound as not_found_exception:
         raise HTTPException(
