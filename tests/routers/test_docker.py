@@ -46,7 +46,7 @@ async def test_docker_attach() -> None:
         with patch.object(DockerClient, "containers") as containers:
             containers.get.side_effect = NotFound("Not found")
             response = await client.get(
-                "/docker/containers/wrong_digest/attach")
+                "/docker/containers/wrong_id/attach")
             assert response.status_code == status.HTTP_404_NOT_FOUND
             assert response.json()["detail"] == "Container not found"
 
