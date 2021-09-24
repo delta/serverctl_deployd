@@ -32,6 +32,11 @@ def _make_fake_api_client() -> docker.APIClient:
         "attach.return_value": fake_api.get_fake_logs()[1],
         "inspect_container.return_value":
             fake_api.get_fake_inspect_container()[1],
+        "prune_containers.return_value": fake_api.get_fake_prune_containers()[1],
+        "prune_images.return_value": fake_api.get_fake_prune_images()[1],
+        "prune_networks.return_value": fake_api.get_fake_prune_networks()[1],
+        "prune_volumes.return_value": fake_api.get_fake_prune_volumes()[1],
+        "prune_builds.return_value": fake_api.get_fake_prune_builds()[1],
         "create_host_config.side_effect": api_client.create_host_config,
     }
     mock_client = CopyReturnMagicMock(**mock_attrs)
