@@ -127,10 +127,8 @@ def test_update_file() -> None:
         # Valid request
         response: Response = client.put(
             "/config/buckets/file",
-            data={
-                "file_path": MOCK_CONF_FILEPATH,
-                "update_command": "echo updated"
-            },
+            params={"file_path": MOCK_CONF_FILEPATH},
+            data={"update_command": "echo updated"},
             files={"new_file": new_file},
         )
         assert response.status_code == 200
@@ -139,10 +137,8 @@ def test_update_file() -> None:
         # Unsuccessful or invalid command
         response = client.put(
             "/config/buckets/file",
-            data={
-                "file_path": MOCK_CONF_FILEPATH,
-                "update_command": "invalid command"
-            },
+            params={"file_path": MOCK_CONF_FILEPATH},
+            data={"update_command": "invalid command"},
             files={"new_file": new_file},
         )
         assert response.status_code == 500
@@ -166,10 +162,10 @@ def test_delete_file() -> None:
     # Valid request
     response: Response = client.delete(
         "/config/buckets/file",
-        json={
-            "file_path": MOCK_CONF_DIRPATH + "delete_this.conf",
-            "update_command": "echo updated"
-        }
+        params={
+            "file_path": MOCK_CONF_DIRPATH + "delete_this.conf"
+        },
+        json={"update_command": "echo updated"}
     )
     assert response.status_code == 204
     assert not Path(MOCK_CONF_DIRPATH + "delete_this.conf").is_file()
@@ -183,10 +179,10 @@ def test_delete_file() -> None:
     # Unsuccessful or invalid command
     response = client.delete(
         "/config/buckets/file",
-        json={
-            "file_path": MOCK_CONF_DIRPATH + "delete_this.conf",
-            "update_command": "invalid command"
-        }
+        params={
+            "file_path": MOCK_CONF_DIRPATH + "delete_this.conf"
+        },
+        json={"update_command": "invalid command"}
     )
     assert response.status_code == 500
     assert response.json() == {

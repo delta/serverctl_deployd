@@ -6,7 +6,7 @@ from typing import Optional, Set
 
 from pydantic import BaseModel
 from pydantic.fields import Field
-from pydantic.types import DirectoryPath, FilePath
+from pydantic.types import DirectoryPath
 
 
 class ListConfigBucket(BaseModel):
@@ -37,14 +37,4 @@ class ConfigBucket(BaseModel):
     )
     update_command: Optional[str] = Field(
         None, title="Command to be run to reload the config file(s)"
-    )
-
-
-class ConfigFile(BaseModel):
-    """Class for config file"""
-    file_path: FilePath = Field(
-        ..., title="Path of config file"
-    )
-    update_command: str = Field(
-        ..., title="Command to be run to reload the config file(s)"
     )

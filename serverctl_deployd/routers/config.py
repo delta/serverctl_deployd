@@ -17,8 +17,7 @@ from fastapi.responses import FileResponse
 from pydantic.types import DirectoryPath, FilePath
 from starlette.responses import Response
 
-from serverctl_deployd.models.config import (ConfigBucket, ConfigFile,
-                                             ListConfigBucket)
+from serverctl_deployd.models.config import ConfigBucket, ListConfigBucket
 from serverctl_deployd.models.exceptions import GenericError
 
 
@@ -175,7 +174,7 @@ async def get_file(file_path: FilePath) -> FileResponse:
     }
 )
 async def update_file(
-    file_path: FilePath = Body(...),
+    file_path: FilePath,
     update_command: str = Body(...),
     new_file: UploadFile = File(...)
 ) -> FileResponse:
@@ -204,12 +203,15 @@ async def update_file(
     },
     status_code=status.HTTP_204_NO_CONTENT
 )
-def delete_file(config_file: ConfigFile) -> Response:
+def delete_file(
+    file_path: FilePath,
+    update_command: str = Body(..., embed=True)
+) -> Response:
     """Deletes the requested config file"""
-    config_file.file_path.unlink()
+    file_path.unlink()
     try:
         subprocess.run(
-            config_file.update_command,
+            update_command,
             shell=True,
             executable="/bin/bash",
             check=True
