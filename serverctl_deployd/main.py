@@ -20,9 +20,11 @@ rotating_file_handler = TimedRotatingFileHandler("logs/serverctl_deployd.log",
                                                  utc=True)
 
 settings = Settings()
-logging.basicConfig(level=settings.log_level,
-                    format="%(asctime)s %(levelname)s: %(message)s",
-                    handlers=[logging.StreamHandler(sys.stdout), rotating_file_handler])
+logging.basicConfig(
+        level=settings.log_level,
+        format="%(asctime)s %(pathname)s %(lineno)d %(levelname)s: %(message)s",
+        handlers=[logging.StreamHandler(sys.stdout), rotating_file_handler]
+        )
 
 app: FastAPI = FastAPI(dependencies=[Depends(check_authentication)])
 

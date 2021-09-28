@@ -2,7 +2,7 @@
 Models for Docker API requests and responses
 """
 
-from typing import Optional
+from typing import List, Optional
 
 from pydantic import BaseModel, Field
 
@@ -65,3 +65,28 @@ class PruneResponse(BaseModel):
     networks: Optional[NetworksDeleted] = None
     volumes: Optional[VolumesDeleted] = None
     build_cache: Optional[BuildCachesDeleted] = None
+
+class ContainerDetails(BaseModel):
+    """Model for container details"""
+    id: str = Field(..., description="Container ID")
+    name: str = Field(..., description="Container name")
+    status: str = Field(..., description="Container status")
+    image: List[str] = Field(None, description="Image name")
+    ports: dict[str, List[dict[str, str]]] = Field(None, description="Container ports")
+    created: str = Field(..., description="Container creation time")
+
+class DeleteRequest(BaseModel):
+    """Model for delete request"""
+    container_id: str = Field(..., description="Container ID")
+    force: bool = Field(False, description="Force delete")
+    v: bool = Field(False, description="Remove volumes")
+
+class ImageTagRequest(BaseModel):
+    """Model for image tag request"""
+    image_id: str = Field(..., description="Image ID")
+    tag: str = Field(..., description="Image tag")
+
+class LogsResponse(BaseModel):
+    """Model for logs response"""
+    container_id: str = Field(..., description="Container ID")
+    logs: str = Field(..., description="Logs")
