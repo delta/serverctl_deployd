@@ -10,6 +10,27 @@ on:
 
 jobs:
 
+  autopep8:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Attempt to use cached dependencies
+      id: cache-python
+      uses: actions/cache@v2
+      with:
+        path: ${{ env.pythonLocation }}
+        key: ${{ env.pythonLocation }}-${{ hashFiles('requirements-dev.txt') }}-${{ github.actor == 'dependabot' }}
+    - name: Installing dependencies
+      if: steps.cache-python.outputs.cache-hit != 'true'
+      run: pip install -r requirements-dev.txt
+    - name: Running autopep8
+      run: autopep8 --exit-code -ra --diff serverctl_deployd/ tests/
+
   pylint:
     runs-on: ubuntu-latest
     steps:
