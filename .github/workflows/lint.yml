@@ -12,99 +12,99 @@ jobs:
   autopep8:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v2
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-      - name: Install pipenv
-        run: pip install pipenv
-      - name: Attempt to use cached dependencies
-        id: cache-python
-        uses: actions/cache@v2
-        with:
-          path: .venv/
-          key: pipenv-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
-      - name: Installing dependencies
-        if: steps.cache-python.outputs.cache-hit != 'true'
-        run: pipenv install --dev
-      - name: Running autopep8
-        run: pipenv run autopep8 --exit-code -ra --diff serverctl_deployd/ tests/
+    - name: Checkout the repository
+      uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install pipenv
+      run: pip install pipenv
+    - name: Attempt to use cached dependencies
+      id: cache-python
+      uses: actions/cache@v2
+      with:
+        path: .venv/
+        key: pipenv-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
+    - name: Installing dependencies
+      if: steps.cache-python.outputs.cache-hit != 'true'
+      run: pipenv install --dev
+    - name: Running autopep8
+      run: pipenv run autopep8 --exit-code -ra --diff serverctl_deployd/ tests/
 
   pylint:
     runs-on: ubuntu-latest
     needs: autopep8
     steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v2
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-      - name: Install pipenv
-        run: pip install pipenv
-      - name: Attempt to use cached dependencies
-        id: cache-python
-        uses: actions/cache@v2
-        with:
-          path: .venv/
-          key: pipenv-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
-      - name: Installing dependencies
-        if: steps.cache-python.outputs.cache-hit != 'true'
-        run: pipenv install --dev
-      - name: Setup environment variables
-        run: cp .env.example .env
-      - name: Running pylint
-        run: pipenv run pylint serverctl_deployd/ tests/ -v
+    - name: Checkout the repository
+      uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install pipenv
+      run: pip install pipenv
+    - name: Attempt to use cached dependencies
+      id: cache-python
+      uses: actions/cache@v2
+      with:
+        path: .venv/
+        key: pipenv-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
+    - name: Installing dependencies
+      if: steps.cache-python.outputs.cache-hit != 'true'
+      run: pipenv install --dev
+    - name: Setup environment variables
+      run: cp .env.example .env
+    - name: Running pylint
+      run: pipenv run pylint serverctl_deployd/ tests/ -v
 
   isort:
     runs-on: ubuntu-latest
     needs: pylint
     steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v2
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-      - name: Install pipenv
-        run: pip install pipenv
-      - name: Attempt to use cached dependencies
-        id: cache-python
-        uses: actions/cache@v2
-        with:
-          path: .venv/
-          key: pipenv-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
-      - name: Installing dependencies
-        if: steps.cache-python.outputs.cache-hit != 'true'
-        run: pipenv install --dev
-      - name: Running isort
-        run: pipenv run isort .
+    - name: Checkout the repository
+      uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install pipenv
+      run: pip install pipenv
+    - name: Attempt to use cached dependencies
+      id: cache-python
+      uses: actions/cache@v2
+      with:
+        path: .venv/
+        key: pipenv-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
+    - name: Installing dependencies
+      if: steps.cache-python.outputs.cache-hit != 'true'
+      run: pipenv install --dev
+    - name: Running isort
+      run: pipenv run isort .
 
   mypy:
     runs-on: ubuntu-latest
     needs: isort
     steps:
-      - name: Checkout the repository
-        uses: actions/checkout@v2
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-      - name: Install pipenv
-        run: pip install pipenv
-      - name: Attempt to use cached dependencies
-        id: cache-python
-        uses: actions/cache@v2
-        with:
-          path: .venv/
-          key: pipenv-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
-      - name: Installing dependencies
-        if: steps.cache-python.outputs.cache-hit != 'true'
-        run: pipenv install --dev
-      - name: Running mypy
-        run: pipenv run mypy .
-        env:
-          MYPY_FORCE_COLOR: 1
-          TERM: xterm-color
+    - name: Checkout the repository
+      uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Install pipenv
+      run: pip install pipenv
+    - name: Attempt to use cached dependencies
+      id: cache-python
+      uses: actions/cache@v2
+      with:
+        path: .venv/
+        key: pipenv-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
+    - name: Installing dependencies
+      if: steps.cache-python.outputs.cache-hit != 'true'
+      run: pipenv install --dev
+    - name: Running mypy
+      run: pipenv run mypy .
+      env:
+        MYPY_FORCE_COLOR: 1
+        TERM: xterm-color
