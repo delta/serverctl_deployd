@@ -24,8 +24,8 @@ jobs:
         id: cache-python
         uses: actions/cache@v2
         with:
-          path: ${{ env.pythonLocation }}
-          key: ${{ env.pythonLocation }}-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
+          path: .venv/
+          key: pipenv-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
       - name: Installing dependencies
         if: steps.cache-python.outputs.cache-hit != 'true'
         run: pipenv install --dev
@@ -50,8 +50,8 @@ jobs:
         id: cache-python
         uses: actions/cache@v2
         with:
-          path: ${{ env.pythonLocation }}
-          key: ${{ env.pythonLocation }}-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
+          path: .venv/
+          key: pipenv-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
       - name: Installing dependencies
         if: steps.cache-python.outputs.cache-hit != 'true'
         run: pipenv install --dev
