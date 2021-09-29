@@ -26,10 +26,9 @@ jobs:
           ${{ env.pythonLocation }}
           .venv/
         key: ${{ env.pythonLocation }}-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
-    - name: Install pipenv
-      run: pip install pipenv
-    - name: Installing dependencies
-      run: pipenv install --dev
+    - name: Install pipenv and dependencies
+      if: steps.cache-python.outputs.cache-hit != 'true'
+      run: pip install pipenv && pipenv install --dev
     - name: Running autopep8
       run: pipenv run autopep8 --exit-code -ra --diff serverctl_deployd/ tests/
 
@@ -51,10 +50,9 @@ jobs:
           ${{ env.pythonLocation }}
           .venv/
         key: ${{ env.pythonLocation }}-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
-    - name: Install pipenv
-      run: pip install pipenv
-    - name: Installing dependencies
-      run: pipenv install --dev
+    - name: Install pipenv and dependencies
+      if: steps.cache-python.outputs.cache-hit != 'true'
+      run: pip install pipenv && pipenv install --dev
     - name: Setup environment variables
       run: cp .env.example .env
     - name: Running pylint
@@ -78,10 +76,9 @@ jobs:
           ${{ env.pythonLocation }}
           .venv/
         key: ${{ env.pythonLocation }}-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
-    - name: Install pipenv
-      run: pip install pipenv
-    - name: Installing dependencies
-      run: pipenv install --dev
+    - name: Install pipenv and dependencies
+      if: steps.cache-python.outputs.cache-hit != 'true'
+      run: pip install pipenv && pipenv install --dev
     - name: Running isort
       run: pipenv run isort .
 
@@ -103,10 +100,9 @@ jobs:
           ${{ env.pythonLocation }}
           .venv/
         key: ${{ env.pythonLocation }}-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
-    - name: Install pipenv
-      run: pip install pipenv
-    - name: Installing dependencies
-      run: pipenv install --dev
+    - name: Install pipenv and dependencies
+      if: steps.cache-python.outputs.cache-hit != 'true'
+      run: pip install pipenv && pipenv install --dev
     - name: Running mypy
       run: pipenv run mypy .
       env:

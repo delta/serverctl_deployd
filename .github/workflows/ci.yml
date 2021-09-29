@@ -26,10 +26,9 @@ jobs:
           ${{ env.pythonLocation }}
           .venv/
         key: ${{ env.pythonLocation }}-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
-    - name: Install pipenv
-      run: pip install pipenv
-    - name: Installing dependencies
-      run: pipenv install --dev
+    - name: Install pipenv and dependencies
+      if: steps.cache-python.outputs.cache-hit != 'true'
+      run: pip install pipenv && pipenv install --dev
     - name: Setup environment variables
       run: cp .env.example .env
     - name: Running pytest
@@ -53,10 +52,9 @@ jobs:
           ${{ env.pythonLocation }}
           .venv/
         key: ${{ env.pythonLocation }}-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
-    - name: Install pipenv
-      run: pip install pipenv
-    - name: Installing dependencies
-      run: pipenv install --dev
+    - name: Install pipenv and dependencies
+      if: steps.cache-python.outputs.cache-hit != 'true'
+      run: pip install pipenv && pipenv install --dev
     - name: Setup environment variables
       run: cp .env.example .env
     - name: Getting coverage report
