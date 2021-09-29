@@ -30,22 +30,19 @@ jobs:
       run: cp .env.example .env
     - name: Getting coverage report
       run: |
-        pipenv shell
-        coverage run -m pytest
-        coverage html
+        pipenv run coverage run -m pytest
+        pipenv run coverage html
         mv htmlcov/* docs/coverage
     - name: Running mypy to get static type coverage report
       run: |
-        pipenv shell
-        mypy .
+        pipenv run mypy .
         mv htmlmypy/* docs/mypy
       env:
         MYPY_FORCE_COLOR: 1
         TERM: xterm-color
     - name: Prepare for staging coverage report
       run: |
-        pipenv shell
-        python serverctl_deployd/main.py docs > ./docs/api-docs/openapi.json
+        pipenv run python serverctl_deployd/main.py docs > ./docs/api-docs/openapi.json
         cat ./docs/api-docs/openapi.json
       env:
         PYTHONPATH: .
