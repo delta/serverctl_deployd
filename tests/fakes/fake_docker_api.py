@@ -25,7 +25,8 @@ def get_fake_containers() -> tuple[int, list[dict[str, str]]]:
     return status_code, response
 
 
-def get_fake_inspect_container(tty: bool = False) -> tuple[int, dict[str, Any]]:
+def get_fake_inspect_container(
+        tty: bool = False) -> tuple[int, dict[str, Any]]:
     """Get fake inspect data"""
     status_code = 200
     response = {

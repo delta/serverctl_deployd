@@ -11,6 +11,11 @@ repos:
     -   id: mixed-line-ending
 -   repo: local
     hooks:
+      - id: autopep8
+        name: autopep8
+        language: system
+        entry: autopep8 --exit-code -iar serverctl_deployd/ tests/
+        pass_filenames: false
       - id: pylint
         name: pylint
         language: system
