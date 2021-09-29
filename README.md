@@ -18,11 +18,10 @@
 
 1. Clone the repo
 2. Run `cp .env.example .env`
-3. Run `virtualenv --clear venv`
-4. Run `source ./venv/bin/activate`
-5. Run `pip install -r requirements-dev.txt`
+3. Run `pipenv shell` to create and activate a virtual environment
+5. Run `pipenv install --dev`
 6. Run `pre-commit install` to install the git hooks for linting and testing
-7. Run `uvicorn serverctl_deployd.main:app --reload` to start the server
+7. Run `pipenv run dev` to start the server
 
 ## License
 

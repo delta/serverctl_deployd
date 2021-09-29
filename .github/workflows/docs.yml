@@ -6,52 +6,56 @@ on:
       - main
 
 jobs:
-
   deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout the repository
-      uses: actions/checkout@v2
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-    - name: Attempt to use cached dependencies
-      id: cache-python
-      uses: actions/cache@v2
-      with:
-        path: ${{ env.pythonLocation }}
-        key: ${{ env.pythonLocation }}-${{ hashFiles('requirements-dev.txt') }}-${{ github.actor == 'dependabot' }}
-    - name: Installing dependencies
-      if: steps.cache-python.outputs.cache-hit != 'true'
-      run: pip install -r requirements-dev.txt
-    - name: Setup environment variables
-      run: cp .env.example .env
-    - name: Getting coverage report
-      run: |
-        coverage run -m pytest
-        coverage html
-        mv htmlcov/* docs/coverage
-    - name: Running mypy to get static type coverage report
-      run: |
-        mypy .
-        mv htmlmypy/* docs/mypy
-      env:
-        MYPY_FORCE_COLOR: 1
-        TERM: xterm-color
-    - name: Prepare for staging coverage report
-      run: |
-        python serverctl_deployd/main.py docs > ./docs/api-docs/openapi.json
-        cat ./docs/api-docs/openapi.json
-      env:
-        PYTHONPATH: .
-    - name: Push docs
-      run: |
-        git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git config --local user.name "github-actions[bot]"
-        git branch -D gh-pages || echo "Branch does not exist"
-        git checkout --orphan gh-pages
-        git rm --cached $(git ls-files)
-        git add docs/*
-        git commit -m "Update docs"
-        git push -f origin gh-pages
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Install pipenv
+        run: pip install pipenv
+      - name: Attempt to use cached dependencies
+        id: cache-python
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.pythonLocation }}
+          key: ${{ env.pythonLocation }}-${{ hashFiles('Pipfile') }}-${{ github.actor == 'dependabot' }}
+      - name: Installing dependencies
+        if: steps.cache-python.outputs.cache-hit != 'true'
+        run: pipenv install --dev
+      - name: Setup environment variables
+        run: cp .env.example .env
+      - name: Getting coverage report
+        run: |
+          pipenv shell
+          coverage run -m pytest
+          coverage html
+          mv htmlcov/* docs/coverage
+      - name: Running mypy to get static type coverage report
+        run: |
+          pipenv shell
+          mypy .
+          mv htmlmypy/* docs/mypy
+        env:
+          MYPY_FORCE_COLOR: 1
+          TERM: xterm-color
+      - name: Prepare for staging coverage report
+        run: |
+          pipenv shell
+          python serverctl_deployd/main.py docs > ./docs/api-docs/openapi.json
+          cat ./docs/api-docs/openapi.json
+        env:
+          PYTHONPATH: .
+      - name: Push docs
+        run: |
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git branch -D gh-pages || echo "Branch does not exist"
+          git checkout --orphan gh-pages
+          git rm --cached $(git ls-files)
+          git add docs/*
+          git commit -m "Update docs"
+          git push -f origin gh-pages
