@@ -24,10 +24,11 @@ router = APIRouter(
     tags=["docker"]
 )
 
+
 @router.get(
     "/containers/{container_id}",
-    response_model = ContainerDetails,
-    responses = {
+    response_model=ContainerDetails,
+    responses={
         status.HTTP_404_NOT_FOUND: {"model": GenericError},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": GenericError}
     }
@@ -42,12 +43,12 @@ async def get_container_details(
     try:
         container: Container = docker_client.containers.get(container_id)
         container_response: ContainerDetails = ContainerDetails(
-            id = container.id,
-            status = container.status,
-            image = container.image.tags,
-            name = container.name,
-            ports = container.ports,
-            created = container.attrs['Created'])
+            id=container.id,
+            status=container.status,
+            image=container.image.tags,
+            name=container.name,
+            ports=container.ports,
+            created=container.attrs['Created'])
 
     except NotFound as not_found_exception:
         raise HTTPException(
@@ -61,9 +62,10 @@ async def get_container_details(
         ) from api_error_exception
     return container_response
 
+
 @router.post(
     "/containers/delete",
-    responses = {
+    responses={
         status.HTTP_404_NOT_FOUND: {"model": GenericError},
         status.HTTP_403_FORBIDDEN: {"model": GenericError},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": GenericError}
@@ -89,17 +91,20 @@ async def delete_container(
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Cannot remove running containers, try forcing") from api_error_exception
-        logging.exception("Error deleting the container %s", delete_request.container_id)
+        logging.exception(
+            "Error deleting the container %s",
+            delete_request.container_id)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error"
         ) from api_error_exception
 
-    return { "message": f"Container {delete_request.container_id} deleted" }
+    return {"message": f"Container {delete_request.container_id} deleted"}
+
 
 @router.post(
     "/containers/{container_id}/start",
-    responses = {
+    responses={
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": GenericError}
     }
 )
@@ -124,14 +129,15 @@ async def start_container(
             detail="Internal server error"
         ) from api_error_exception
 
-    return { "message": f"Container {container_id} started" }
+    return {"message": f"Container {container_id} started"}
+
 
 @router.post(
     "/containers/{container_id}/stop",
-    responses = {
+    responses={
         status.HTTP_404_NOT_FOUND: {"model": GenericError},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": GenericError}
-})
+    })
 async def stop_container(
     container_id: str,
     docker_client: DockerClient = Depends(get_docker_client)
@@ -153,14 +159,15 @@ async def stop_container(
             detail="Internal server error"
         ) from api_error_exception
 
-    return { "message": f"Container {container_id} stopped" }
+    return {"message": f"Container {container_id} stopped"}
+
 
 @router.post(
     "/containers/{container_id}/restart",
-    responses = {
+    responses={
         status.HTTP_404_NOT_FOUND: {"model": GenericError},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": GenericError}
-})
+    })
 async def restart_container(
     container_id: str,
     docker_client: DockerClient = Depends(get_docker_client)
@@ -182,15 +189,16 @@ async def restart_container(
             detail="Internal server error"
         ) from api_error_exception
 
-    return { "message": f"Container {container_id} restarted" }
+    return {"message": f"Container {container_id} restarted"}
+
 
 @router.post(
     "/containers/{container_id}/kill",
-    responses = {
+    responses={
         status.HTTP_404_NOT_FOUND: {"model": GenericError},
         status.HTTP_403_FORBIDDEN: {"model": GenericError},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": GenericError}
-})
+    })
 async def kill_container(
     container_id: str,
     docker_client: DockerClient = Depends(get_docker_client)
@@ -217,15 +225,16 @@ async def kill_container(
             detail="Internal server error"
         ) from api_error_exception
 
-    return { "message": f"Container {container_id} killed" }
+    return {"message": f"Container {container_id} killed"}
+
 
 @router.get(
     "/containers/{container_id}/logs",
-    response_model = LogsResponse,
-    responses = {
+    response_model=LogsResponse,
+    responses={
         status.HTTP_404_NOT_FOUND: {"model": GenericError},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": GenericError}
-})
+    })
 async def get_logs(
     container_id: str,
     docker_client: DockerClient = Depends(get_docker_client)
@@ -241,53 +250,57 @@ async def get_logs(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Container not found") from not_found_exception
     except APIError as api_error_exception:
-        logging.exception("Error getting the logs of the container %s", container_id)
+        logging.exception(
+            "Error getting the logs of the container %s",
+            container_id)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error"
         ) from api_error_exception
 
-    return LogsResponse(container_id = container_id ,logs=logs)
+    return LogsResponse(container_id=container_id, logs=logs)
+
 
 @router.get("/containers",
-    response_model = List[ContainerDetails],
-    responses = {
-        status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": GenericError}
-    }
-)
+            response_model=List[ContainerDetails],
+            responses={
+                status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": GenericError}
+            }
+            )
 async def get_containers(
     docker_client: DockerClient = Depends(get_docker_client)
-    ) -> List[ContainerDetails]:
+) -> List[ContainerDetails]:
     """
     Get all containers
     """
     try:
         containers: List[Container] = [ContainerDetails(
-            id = container.id,
-            status = container.status,
-            image = container.image.tags,
-            name = container.name,
-            ports = container.ports,
-            created = container.attrs['Created']
-            )
+            id=container.id,
+            status=container.status,
+            image=container.image.tags,
+            name=container.name,
+            ports=container.ports,
+            created=container.attrs['Created']
+        )
             for container in docker_client.containers.list(all=True)]
     except APIError as api_error_exception:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error"
-            ) from api_error_exception
+        ) from api_error_exception
     return containers
+
 
 @router.post(
     "/images/tag",
-    responses = {
+    responses={
         status.HTTP_404_NOT_FOUND: {"model": GenericError},
         status.HTTP_500_INTERNAL_SERVER_ERROR: {"model": GenericError}
     })
 async def tag_image(
     tag_image_request: ImageTagRequest,
     docker_client: DockerClient = Depends(get_docker_client)
-    ) -> Dict[str, str]:
+) -> Dict[str, str]:
     """
     Tag image
     """
@@ -304,7 +317,8 @@ async def tag_image(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Internal server error"
         ) from api_error_exception
-    return { "message": f"Image {tag_image_request.image_id} tagged" }
+    return {"message": f"Image {tag_image_request.image_id} tagged"}
+
 
 @router.post(
     "/prune",

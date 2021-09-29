@@ -2,7 +2,7 @@
 Tests for the Docker API routes
 """
 
-from unittest.mock import patch
+from unittest.mock import PropertyMock, patch
 
 import pytest
 from async_asgi_testclient import TestClient
@@ -105,6 +105,7 @@ async def test_docker_attach() -> None:
             assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
             assert response.json()["detail"] == "Internal server error"
 
+
 @pytest.mark.asyncio
 async def test_docker_get_containers() -> None:
     """Test the docker get containers endpoint"""
@@ -115,7 +116,8 @@ async def test_docker_get_containers() -> None:
         containers: Response = await client.get("/docker/containers")
         assert containers.status_code == status.HTTP_200_OK
         for container in containers.json():
-            # TODO: Fix the test as image name is not being returned currently # pylint: disable=fixme
+            # pylint: disable-next=fixme
+            # TODO: Fix the test as image name is not being returned currently
             container_details = ContainerDetails.parse_obj(container)
             assert container_details.id == FAKE_CONTAINER_ID
             assert container_details.name == FAKE_CONTAINER_NAME
@@ -128,6 +130,7 @@ async def test_docker_get_containers() -> None:
             assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
             assert response.json()["detail"] == "Internal server error"
 
+
 @pytest.mark.asyncio
 async def test_docker_get_container_details() -> None:
     """Test the docker get container details endpoint"""
@@ -138,7 +141,8 @@ async def test_docker_get_container_details() -> None:
         container_details: Response = await client.get(
             f"/docker/containers/{FAKE_CONTAINER_ID}")
         assert container_details.status_code == status.HTTP_200_OK
-        container_details = ContainerDetails.parse_obj(container_details.json())
+        container_details = ContainerDetails.parse_obj(
+            container_details.json())
         assert container_details.id == FAKE_CONTAINER_ID
         assert container_details.name == FAKE_CONTAINER_NAME
         assert isinstance(container_details, ContainerDetails)
@@ -159,45 +163,71 @@ async def test_docker_get_container_details() -> None:
             assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
             assert response.json()["detail"] == "Internal server error"
 
-# @pytest.mark.asyncio
-# async def test_docker_post_container_delete() -> None:
-#     """Test the docker post container delete endpoint"""
 
-#     async with TestClient(app) as client:
+@pytest.mark.asyncio
+async def test_docker_post_container_delete() -> None:
+    """Test the docker post container delete endpoint"""
 
-#         # Test successful delete container
-#         response: Response = await client.post(
-#                 "/docker/containers/delete",
-#                 json={
-#                 "container_id" : FAKE_CONTAINER_ID
-#                 }
-#             )
-#         assert response.status_code == status.HTTP_200_OK
-#         assert response.json()["message"] == f"Container {FAKE_CONTAINER_ID} deleted"
+    async with TestClient(app) as client:
 
-#         # Test condition where container does not exist
-#         with patch.object(DockerClient, "containers") as containers:
-#             containers.get.side_effect = NotFound("Not found")
-#             response = await client.post(
-#                 "/docker/containers/delete",
-#                 json={
-#                     "container_id" : FAKE_CONTAINER_ID
-#                 }
-#             )
-#             assert response.status_code == status.HTTP_404_NOT_FOUND
-#             assert response.json()["detail"] == "Container not found"
+        # Test successful delete container
+        response: Response = await client.post(
+            "/docker/containers/delete",
+            json={
+                "container_id": FAKE_CONTAINER_ID
+            }
+        )
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()[
+            "message"] == f"Container {FAKE_CONTAINER_ID} deleted"
 
-#         # Test condition where Docker API fails
-#         with patch.object(DockerClient, "containers") as containers:
-#             containers.get.side_effect = APIError("API Error")
-#             response = await client.post(
-#                 "/docker/containers/delete",
-#                 json={
-#                     "container_id" : FAKE_CONTAINER_ID
-#                 }
-#             )
-#             assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
-#             assert response.json()["detail"] == "Internal server error"
+        # Test condition where container does not exist
+        with patch.object(DockerClient, "containers") as containers:
+            containers.get.side_effect = NotFound("Not found")
+            response = await client.post(
+                "/docker/containers/delete",
+                json={
+                    "container_id": FAKE_CONTAINER_ID
+                }
+            )
+            assert response.status_code == status.HTTP_404_NOT_FOUND
+            assert response.json()["detail"] == "Container not found"
+
+        # Test condition where Docker API fails as container can't be removed
+        with patch("docker.models.containers.Container.remove") as container_remove,\
+            patch(
+                "docker.models.containers.Container.status",
+                new_callable=PropertyMock
+        ) as container_status:
+            container_remove.side_effect = APIError("API Error")
+            container_status.return_value = "running"
+            response = await client.post(
+                "/docker/containers/delete",
+                json={
+                    "container_id": FAKE_CONTAINER_ID
+                }
+            )
+            assert response.status_code == status.HTTP_403_FORBIDDEN
+            assert response.json()[
+                "detail"] == "Cannot remove running containers, try forcing"
+
+        # Test condition where Docker API fails
+        with patch("docker.models.containers.Container.remove") as container_remove,\
+            patch(
+                "docker.models.containers.Container.status",
+                new_callable=PropertyMock
+        ) as container_status:
+            container_remove.side_effect = APIError("API Error")
+            container_status.return_value = "exited"
+            response = await client.post(
+                "/docker/containers/delete",
+                json={
+                    "container_id": FAKE_CONTAINER_ID
+                }
+            )
+            assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+            assert response.json()["detail"] == "Internal server error"
+
 
 @pytest.mark.asyncio
 async def test_docker_post_container_start() -> None:
@@ -208,7 +238,8 @@ async def test_docker_post_container_start() -> None:
         # Test successful start container
         response: Response = await client.post(f"/docker/containers/{FAKE_CONTAINER_ID}/start")
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()["message"] == f"Container {FAKE_CONTAINER_ID} started"
+        assert response.json()[
+            "message"] == f"Container {FAKE_CONTAINER_ID} started"
 
         # Test condition where container does not exist
         with patch.object(DockerClient, "containers") as containers:
@@ -223,6 +254,7 @@ async def test_docker_post_container_start() -> None:
             response = await client.post(f"/docker/containers/{FAKE_CONTAINER_ID}/start")
             assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
             assert response.json()["detail"] == "Internal server error"
+
 
 @pytest.mark.asyncio
 async def test_docker_post_container_stop() -> None:
@@ -233,7 +265,8 @@ async def test_docker_post_container_stop() -> None:
         # Test successful stop container
         response: Response = await client.post(f"/docker/containers/{FAKE_CONTAINER_ID}/stop")
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()["message"] == f"Container {FAKE_CONTAINER_ID} stopped"
+        assert response.json()[
+            "message"] == f"Container {FAKE_CONTAINER_ID} stopped"
 
         # Test condition where container does not exist
         with patch.object(DockerClient, "containers") as containers:
@@ -248,6 +281,7 @@ async def test_docker_post_container_stop() -> None:
             response = await client.post(f"/docker/containers/{FAKE_CONTAINER_ID}/stop")
             assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
             assert response.json()["detail"] == "Internal server error"
+
 
 @pytest.mark.asyncio
 async def test_docker_post_container_restart() -> None:
@@ -258,7 +292,8 @@ async def test_docker_post_container_restart() -> None:
         # Test successful restart container
         response: Response = await client.post(f"/docker/containers/{FAKE_CONTAINER_ID}/restart")
         assert response.status_code == status.HTTP_200_OK
-        assert response.json()["message"] == f"Container {FAKE_CONTAINER_ID} restarted"
+        assert response.json()[
+            "message"] == f"Container {FAKE_CONTAINER_ID} restarted"
 
         # Test condition where container does not exist
         with patch.object(DockerClient, "containers") as containers:
@@ -274,29 +309,50 @@ async def test_docker_post_container_restart() -> None:
             assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
             assert response.json()["detail"] == "Internal server error"
 
-# @pytest.mark.asyncio
-# async def test_docker_post_container_kill() -> None:
-#     """Test the docker post kill container endpoint"""
-#     async with TestClient(app) as client:
 
-#         # Test successful kill container
-#         response: Response = await client.post(f"/docker/containers/{FAKE_CONTAINER_ID}/kill")
-#         assert response.status_code == status.HTTP_200_OK
-#         assert response.json()["message"] == f"Container {FAKE_CONTAINER_ID} killed"
+@pytest.mark.asyncio
+async def test_docker_post_container_kill() -> None:
+    """Test the docker post kill container endpoint"""
+    async with TestClient(app) as client:
 
-#         # Test condition where container does not exist
-#         with patch.object(DockerClient, "containers") as containers:
-#             containers.get.side_effect = NotFound("Not found")
-#             response = await client.post(f"/docker/containers/{FAKE_CONTAINER_ID}/kill")
-#             assert response.status_code == status.HTTP_404_NOT_FOUND
-#             assert response.json()["detail"] == "Container not found"
+        # Test successful kill container
+        response: Response = await client.post(f"/docker/containers/{FAKE_CONTAINER_ID}/kill")
+        assert response.status_code == status.HTTP_200_OK
+        assert response.json()[
+            "message"] == f"Container {FAKE_CONTAINER_ID} killed"
 
-#         # Test condition where Docker API fails
-#         with patch.object(DockerClient, "containers") as containers:
-#             containers.get.side_effect = APIError("API Error")
-#             response = await client.post(f"/docker/containers/{FAKE_CONTAINER_ID}/kill")
-#             assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
-#             assert response.json()["detail"] == "Internal server error"
+        # Test condition where container does not exist
+        with patch.object(DockerClient, "containers") as containers:
+            containers.get.side_effect = NotFound("Not found")
+            response = await client.post(f"/docker/containers/{FAKE_CONTAINER_ID}/kill")
+            assert response.status_code == status.HTTP_404_NOT_FOUND
+            assert response.json()["detail"] == "Container not found"
+
+        # Test condition where Docker API fails as container is not running
+        with patch("docker.models.containers.Container.kill") as container_kill,\
+            patch(
+                "docker.models.containers.Container.status",
+                new_callable=PropertyMock
+        ) as container_status:
+            container_kill.side_effect = APIError("API Error")
+            container_status.return_value = "exited"
+            response = await client.post(f"/docker/containers/{FAKE_CONTAINER_ID}/kill")
+            assert response.status_code == status.HTTP_403_FORBIDDEN
+            assert response.json()[
+                "detail"] == "Cannot kill containers that are not running"
+
+        # Test condition where Docker API fails
+        with patch("docker.models.containers.Container.kill") as container_kill,\
+            patch(
+                "docker.models.containers.Container.status",
+                new_callable=PropertyMock
+        ) as container_status:
+            container_kill.side_effect = APIError("API Error")
+            container_status.return_value = "running"
+            response = await client.post(f"/docker/containers/{FAKE_CONTAINER_ID}/kill")
+            assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
+            assert response.json()["detail"] == "Internal server error"
+
 
 @pytest.mark.asyncio
 async def test_docker_post_container_logs() -> None:
@@ -323,13 +379,14 @@ async def test_docker_post_container_logs() -> None:
             assert response.status_code == status.HTTP_500_INTERNAL_SERVER_ERROR
             assert response.json()["detail"] == "Internal server error"
 
+
 @pytest.mark.asyncio
 async def test_docker_post_tag_image() -> None:
     """Test post tag image endpoint"""
     async with TestClient(app) as client:
 
         # Test successful tag image
-        response: Response = await client.post("/docker/images/tag", json= {
+        response: Response = await client.post("/docker/images/tag", json={
             "image_id": FAKE_IMAGE_ID,
             "tag": FAKE_TAG
         })
@@ -339,7 +396,7 @@ async def test_docker_post_tag_image() -> None:
         # Test condition where image does not exist
         with patch.object(DockerClient, "images") as images:
             images.get.side_effect = ImageNotFound("Not found")
-            response = await client.post("/docker/images/tag", json= {
+            response = await client.post("/docker/images/tag", json={
                 "image_id": FAKE_IMAGE_ID,
                 "tag": FAKE_TAG
             })
@@ -349,7 +406,7 @@ async def test_docker_post_tag_image() -> None:
         # Test condition where Docker API fails
         with patch.object(DockerClient, "images") as images:
             images.get.side_effect = APIError("API Error")
-            response = await client.post("/docker/images/tag", json= {
+            response = await client.post("/docker/images/tag", json={
                 "image_id": FAKE_IMAGE_ID,
                 "tag": FAKE_TAG
             })

@@ -14,6 +14,7 @@ FAKE_TAG = "sha256:e9aafierojv"
 FAKE_CONTAINER_NAME = "jolly_black"
 FAKE_LOGS_MESSAGE = 'Hello World\nThis is test logs'
 
+
 def get_fake_containers() -> tuple[int, list[dict[str, str]]]:
     """Get list of fake containers"""
     status_code = 200
@@ -27,8 +28,7 @@ def get_fake_containers() -> tuple[int, list[dict[str, str]]]:
     return status_code, response
 
 
-def get_fake_inspect_container(
-        tty: bool = False) -> tuple[int, dict[str, Any]]:
+def get_fake_inspect_container() -> tuple[int, dict[str, Any]]:
     """Get fake inspect data"""
     status_code = 200
     response = {
@@ -241,6 +241,7 @@ def get_fake_inspect_container(
 
     return status_code, response
 
+
 def get_fake_inspect_image() -> tuple[int, dict[str, Any]]:
     "Fake inspect image"
     status_code = 200
@@ -275,6 +276,7 @@ def get_fake_inspect_image() -> tuple[int, dict[str, Any]]:
     }
     return status_code, response
 
+
 def get_fake_images() -> tuple[int, list[dict[str, Any]]]:
     "Fake list images"
     status_code = 200
@@ -285,6 +287,7 @@ def get_fake_images() -> tuple[int, list[dict[str, Any]]]:
         'RepoTags': ['busybox:latest', 'busybox:1.0'],
     }]
     return status_code, response
+
 
 def get_fake_prune_containers() -> tuple[int, dict[str, Any]]:
     """Get fake prune containers response"""
@@ -339,10 +342,12 @@ def _get_log_stream() -> Generator[bytes, None, None]:
     for _ in range(FAKE_LOG_LINE_COUNT):
         yield FAKE_LOG_LINE_CONTENT
 
+
 def get_fake_logs() -> tuple[int, Generator[bytes, None, None]]:
     """Get fake container logs"""
     status_code = 200
     return status_code, _get_log_stream()
+
 
 def get_fake_logs_response() -> tuple[int, bytes]:
     """Get fake logs response"""
