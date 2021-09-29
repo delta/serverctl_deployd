@@ -22,7 +22,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{ env.pythonLocation }}
-          key: ${{ env.pythonLocation }}-${{ hashFiles('Pipfile') }}-${{ github.actor == 'dependabot' }}
+          key: ${{ env.pythonLocation }}-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
       - name: Installing dependencies
         if: steps.cache-python.outputs.cache-hit != 'true'
         run: pipenv install --dev
