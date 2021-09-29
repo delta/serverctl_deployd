@@ -14,7 +14,7 @@ repos:
       - id: autopep8
         name: autopep8
         language: system
-        entry: autopep8 -iar serverctl_deployd/ tests/
+        entry: autopep8 --exit-code -iar serverctl_deployd/ tests/
         pass_filenames: false
       - id: pylint
         name: pylint
