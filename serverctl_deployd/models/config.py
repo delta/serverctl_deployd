@@ -38,3 +38,10 @@ class ConfigBucket(BaseModel):
     update_command: Optional[str] = Field(
         None, title="Command to be run to reload the config file(s)"
     )
+
+
+class UpdateCommand(BaseModel):
+    """Class for update command"""
+    update_command: str = Field(
+        ..., title="Command to be run to reload the config file(s)"
+    )

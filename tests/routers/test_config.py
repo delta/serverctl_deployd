@@ -32,9 +32,7 @@ def test_validate_bucket() -> None:
         json={
             "directory_path": MOCK_CONF_DIRPATH,
             "update_command": "echo updated",
-            "ignore_patterns": [
-                "leave*"
-            ]
+            "ignore_patterns": ["leave*"]
         })
     assert response.status_code == 200
     assert response.json() == {
@@ -69,9 +67,7 @@ def test_list_filenames() -> None:
             "ignore_patterns": ["leave*"]
         })
     assert response.status_code == 200
-    assert response.json() == [
-        "mock.conf"
-    ]
+    assert response.json() == ["mock.conf"]
 
     rmtree(MOCK_CONF_DIRPATH)
 
