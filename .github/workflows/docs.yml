@@ -6,7 +6,6 @@ on:
       - main
 
 jobs:
-
   deploy:
     runs-on: ubuntu-latest
     steps:
@@ -20,20 +19,24 @@ jobs:
       id: cache-python
       uses: actions/cache@v2
       with:
-        path: ${{ env.pythonLocation }}
-        key: ${{ env.pythonLocation }}-${{ hashFiles('requirements-dev.txt') }}-${{ github.actor == 'dependabot' }}
-    - name: Installing dependencies
+        path: |
+          ${{ env.pythonLocation }}
+          .venv/
+        key: ${{ env.pythonLocation }}-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
+    - name: Install pipenv and dependencies
       if: steps.cache-python.outputs.cache-hit != 'true'
-      run: pip install -r requirements-dev.txt
+      run: pip install pipenv && pipenv install --dev
     - name: Setup environment variables
       run: cp .env.example .env
     - name: Getting coverage report
       run: |
+        pipenv shell
         coverage run -m pytest
         coverage html
         mv htmlcov/* docs/coverage
     - name: Running mypy to get static type coverage report
       run: |
+        pipenv shell
         mypy .
         mv htmlmypy/* docs/mypy
       env:
@@ -41,6 +44,7 @@ jobs:
         TERM: xterm-color
     - name: Prepare for staging coverage report
       run: |
+        pipenv shell
         python serverctl_deployd/main.py docs > ./docs/api-docs/openapi.json
         cat ./docs/api-docs/openapi.json
       env:
