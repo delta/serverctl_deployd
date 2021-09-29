@@ -18,16 +18,17 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
-    - name: Install pipenv
-      run: pip install pipenv
     - name: Attempt to use cached dependencies
       id: cache-python
       uses: actions/cache@v2
       with:
-        path: .venv/
-        key: pipenv-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
+        path: |
+          ${{ env.pythonLocation }}
+          .venv/
+        key: ${{ env.pythonLocation }}-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
+    - name: Install pipenv
+      run: pip install pipenv
     - name: Installing dependencies
-      if: steps.cache-python.outputs.cache-hit != 'true'
       run: pipenv install --dev
     - name: Setup environment variables
       run: cp .env.example .env
@@ -44,16 +45,17 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.9
-    - name: Install pipenv
-      run: pip install pipenv
     - name: Attempt to use cached dependencies
       id: cache-python
       uses: actions/cache@v2
       with:
-        path: .venv/
-        key: pipenv-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
+        path: |
+          ${{ env.pythonLocation }}
+          .venv/
+        key: ${{ env.pythonLocation }}-${{ hashFiles('Pipfile.lock') }}-${{ github.actor == 'dependabot' }}
+    - name: Install pipenv
+      run: pip install pipenv
     - name: Installing dependencies
-      if: steps.cache-python.outputs.cache-hit != 'true'
       run: pipenv install --dev
     - name: Setup environment variables
       run: cp .env.example .env
