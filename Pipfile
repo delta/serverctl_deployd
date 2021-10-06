@@ -10,7 +10,7 @@ prod = "uvicorn serverctl_deployd.main:app"
 [packages]
 uvicorn = "==0.15.0"
 pydantic = "==1.8.2"
-fastapi = "==0.68.1"
+fastapi = "==0.68.2"
 python-dotenv = "==0.19.0"
 docker = "==5.0.2"
 python-multipart = "==0.0.5"
