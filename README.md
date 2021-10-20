@@ -19,9 +19,9 @@
 1. Clone the repo
 2. Run `cp .env.example .env`
 3. Run `pipenv shell` to create and activate a virtual environment
-5. Run `pipenv install --dev`
-6. Run `pre-commit install` to install the git hooks for linting and testing
-7. Run `pipenv run dev` to start the server
+4. Run `pipenv install --dev`
+5. Run `pre-commit install` to install the git hooks for linting and testing
+6. Run `pipenv run dev` to start the server
 
 ## License
 

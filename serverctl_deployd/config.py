@@ -16,6 +16,10 @@ class Settings(BaseSettings):  # pylint: disable=too-few-public-methods
     """Class for global settings"""
     environment: Optional[str] = os.getenv("ENVIRONMENT")
     log_level: str = os.getenv("LOGLEVEL", "WARNING").upper()
+    data_files_dir: str = os.getenv(
+        "DATA_FILES_LOCATION",
+        "/etc/serverctl_deployd/"
+    )
 
 
 settings = Settings()
