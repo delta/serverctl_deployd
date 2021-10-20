@@ -41,8 +41,6 @@ def _merge_dicts(
                 pass
             else:
                 current[key] = update[key]
-        else:
-            current[key] = update[key]
     return current
 
 

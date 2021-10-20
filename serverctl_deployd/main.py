@@ -11,7 +11,7 @@ import uvicorn
 from fastapi import Depends, FastAPI
 
 from serverctl_deployd.config import Settings
-from serverctl_deployd.dependencies import check_authentication
+from serverctl_deployd.dependencies import check_authentication, get_settings
 from serverctl_deployd.routers import config, deployments, docker
 
 rotating_file_handler = TimedRotatingFileHandler("logs/serverctl_deployd.log",
@@ -19,7 +19,7 @@ rotating_file_handler = TimedRotatingFileHandler("logs/serverctl_deployd.log",
                                                  backupCount=48,
                                                  utc=True)
 
-settings = Settings()
+settings: Settings = get_settings()
 logging.basicConfig(
     level=settings.log_level,
     format="%(asctime)s %(pathname)s %(lineno)d %(levelname)s: %(message)s",

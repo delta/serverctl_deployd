@@ -6,6 +6,7 @@ import json
 import os
 from pathlib import Path
 from subprocess import CalledProcessError
+from typing import Any, Dict
 from unittest.mock import patch
 
 from fastapi.testclient import TestClient
@@ -33,7 +34,6 @@ app.dependency_overrides[get_settings] = settings_override
 
 def test_create_deployment() -> None:
     """Test for create deployment"""
-    make_fake_deployments_file()
     Path(MOCK_COMPOSE_FILE).touch()
     request_json = {
         "name": "test-deployment",
@@ -138,11 +138,11 @@ def test_get_deployment() -> None:
 def test_update_deployment() -> None:
     """Test for updation of a deployment"""
     make_fake_deployments_file()
-    request_json = {
-        "compose_path": MOCK_COMPOSE_FILE,
+    request_json: Dict[str, Any] = {
         "databases": {
             "sample-db": {
                 "dbtype": "mongodb",
+                "username": "root"
             }
         }
     }
@@ -161,6 +161,7 @@ def test_update_deployment() -> None:
             assert deployment_in_file == UPDATED_DATA_CONTENT
 
     # Invalid compose file
+    request_json["compose_path"] = MOCK_COMPOSE_FILE
     with patch(
         "serverctl_deployd.routers.deployments.subprocess.run",
         side_effect=CalledProcessError(1, "")
@@ -219,6 +220,12 @@ def test_compose_up() -> None:
         assert response.status_code == 200
         assert response.json() == {"message": "docker-compose up executed"}
 
+    # Deployment not found
+    with patch("serverctl_deployd.routers.deployments.subprocess.run"):
+        response = client.post("/deployments/non-existent-deployment/up")
+        assert response.status_code == 404
+        assert response.json() == {"detail": "Deployment does not exist"}
+
     # OSError
     with patch(
         "serverctl_deployd.routers.deployments.subprocess.Popen",
@@ -240,6 +247,12 @@ def test_compose_down() -> None:
         response: Response = client.post("/deployments/sample-deployment/down")
         assert response.status_code == 200
         assert response.json() == {"message": "docker-compose down executed"}
+
+    # Deployment not found
+    with patch("serverctl_deployd.routers.deployments.subprocess.run"):
+        response = client.post("/deployments/non-existent-deployment/down")
+        assert response.status_code == 404
+        assert response.json() == {"detail": "Deployment does not exist"}
 
     # OSError
     with patch(
