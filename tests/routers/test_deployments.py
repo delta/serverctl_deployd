@@ -221,7 +221,7 @@ def test_compose_up() -> None:
         assert response.json() == {"message": "docker-compose up executed"}
 
     # Deployment not found
-    with patch("serverctl_deployd.routers.deployments.subprocess.run"):
+    with patch("serverctl_deployd.routers.deployments.subprocess.Popen"):
         response = client.post("/deployments/non-existent-deployment/up")
         assert response.status_code == 404
         assert response.json() == {"detail": "Deployment does not exist"}
@@ -249,7 +249,7 @@ def test_compose_down() -> None:
         assert response.json() == {"message": "docker-compose down executed"}
 
     # Deployment not found
-    with patch("serverctl_deployd.routers.deployments.subprocess.run"):
+    with patch("serverctl_deployd.routers.deployments.subprocess.Popen"):
         response = client.post("/deployments/non-existent-deployment/down")
         assert response.status_code == 404
         assert response.json() == {"detail": "Deployment does not exist"}
