@@ -6,7 +6,6 @@ import json
 import shlex
 import subprocess
 from os import path, scandir
-from pathlib import Path
 from shutil import rmtree
 from typing import Any, Dict, Set
 
@@ -68,17 +67,17 @@ def create_deployment(
         ) from dir_exists_error
 
     compose_path = deployment_path.joinpath("docker-compose.yml")
-    Path(compose_path).write_text(deployment.compose_file,
-                                  encoding="utf-8")
+    compose_path.write_text(deployment.compose_file,
+                            encoding="utf-8")
 
     if deployment.env_file:
         env_path = deployment_path.joinpath(".env")
-        Path(env_path).write_text(deployment.env_file,
-                                  encoding="utf-8")
+        env_path.write_text(deployment.env_file,
+                            encoding="utf-8")
 
     if deployment.databases:
         db_file = deployment_path.joinpath("databases.json")
-        Path(db_file).touch()
+        db_file.touch()
 
         with open(db_file, "w", encoding="utf-8") as json_file:
             db_json = jsonable_encoder(deployment.databases)
@@ -87,13 +86,7 @@ def create_deployment(
     return deployment
 
 
-@router.get(
-    "/",
-    responses={
-        status.HTTP_404_NOT_FOUND: {"model": GenericError}
-    },
-    response_model=Set[str]
-)
+@router.get("/", response_model=Set[str])
 def get_deployments(
     settings: Settings = Depends(get_settings)
 ) -> Set[str]:
