@@ -3,9 +3,7 @@ Tests for routes at deployments endpoint
 """
 
 import json
-import os
-from pathlib import Path
-from subprocess import CalledProcessError
+from shutil import rmtree
 from typing import Any, Dict
 from unittest.mock import patch
 
@@ -15,18 +13,20 @@ from requests.models import Response
 from serverctl_deployd.config import Settings
 from serverctl_deployd.dependencies import get_settings
 from serverctl_deployd.main import app
-from tests.fakes.fake_deployments import (DEPLOYMENTS_DATA_CONTENT,
-                                          MOCK_COMPOSE_FILE,
-                                          MOCK_DEPLOYMENTS_FILE,
-                                          UPDATED_DATA_CONTENT,
-                                          make_fake_deployments_file)
+from tests.fakes.fake_deployments import (MOCK_COMPOSE_FILE, MOCK_COMPOSE_PATH,
+                                          MOCK_DB_CONFIG_CONTENT,
+                                          MOCK_DB_JSON_PATH,
+                                          MOCK_DEPLOYMENTS_PATH, MOCK_ENV_FILE,
+                                          MOCK_ENV_PATH, TEST_DEPLOYMENT_PATH,
+                                          UPDATED_DB_CONFIG_CONTENT,
+                                          make_fake_deployment)
 
 client = TestClient(app)
 
 
 def settings_override() -> Settings:
     """Override settings with fake data file directory"""
-    return Settings(data_files_dir="tests/fakes/")
+    return Settings(deployments_dir="tests/fakes/.serverctl")
 
 
 app.dependency_overrides[get_settings] = settings_override
@@ -34,96 +34,62 @@ app.dependency_overrides[get_settings] = settings_override
 
 def test_create_deployment() -> None:
     """Test for create deployment"""
-    Path(MOCK_COMPOSE_FILE).touch()
     request_json = {
         "name": "test-deployment",
-        "compose_path": MOCK_COMPOSE_FILE,
-        "databases": {
-            "db1": {
-                "dbtype": "mysql",
-                "username": "root",
-                "password": "strongpw"
-            },
-            "db2": {
-                "dbtype": "mongodb",
-                "username": "superuser",
-                "password": "strongerpw"
-            }
-        }
+        "compose_file": MOCK_COMPOSE_FILE,
+        "env_file": MOCK_ENV_FILE,
+        "databases": MOCK_DB_CONFIG_CONTENT
     }
 
     # Successful request
-    with patch("serverctl_deployd.routers.deployments.subprocess.run"):
-        response: Response = client.post(
-            "/deployments/",
-            json=request_json
-        )
-        assert response.status_code == 200
-        assert response.json() == request_json
-    with open(MOCK_DEPLOYMENTS_FILE, "r", encoding="utf-8") as json_file:
-        json_data = json.load(json_file)
-        deployment_in_file = json_data[request_json["name"]]
-        deployment_details = request_json
-        del deployment_details["name"]
-        assert deployment_in_file == deployment_details
+    response: Response = client.post("/deployments/", json=request_json)
+    assert response.status_code == 200
+    assert response.json() == request_json
 
-    # Invalid compose file
-    with patch(
-        "serverctl_deployd.routers.deployments.subprocess.run",
-        side_effect=CalledProcessError(1, "")
-    ):
-        request_json["name"] = "has-invalid-compose-file"
-        response = client.post(
-            "/deployments/",
-            json=request_json
-        )
-        assert response.status_code == 422
-        assert response.json() == {
-            "detail": "Invalid docker-compose file"
-        }
+    with open(MOCK_COMPOSE_PATH, "r", encoding="utf-8") as compose_file:
+        file_content = compose_file.read()
+        assert file_content == MOCK_COMPOSE_FILE
+
+    with open(MOCK_ENV_PATH, "r", encoding="utf-8") as env_file:
+        env_content = env_file.read()
+        assert env_content == MOCK_ENV_FILE
+
+    with open(MOCK_DB_JSON_PATH, "r", encoding="utf-8") as json_file:
+        env_content = json.load(json_file)
+        assert env_content == request_json["databases"]
 
     # Deployment name already exists
-    with patch("serverctl_deployd.routers.deployments.subprocess.run"):
-        request_json["name"] = "test-deployment"
-        response = client.post(
-            "/deployments/",
-            json=request_json
-        )
-        assert response.status_code == 409
-        assert response.json() == {
-            "detail": "A deployment with same name already exists"
-        }
+    response = client.post("/deployments/", json=request_json)
+    assert response.status_code == 409
+    assert response.json() == {
+        "detail": "A deployment with same name already exists"
+    }
 
-    os.remove(MOCK_COMPOSE_FILE)
-    os.remove(MOCK_DEPLOYMENTS_FILE)
+    rmtree(MOCK_DEPLOYMENTS_PATH)
 
 
 def test_get_deployments() -> None:
-    """Test for getting details of all deployments"""
-    make_fake_deployments_file()
+    """Test for getting list of all deployments"""
+    mock_deployment_list = {"sample1", "sample3", "sample2"}
+    for deployment in mock_deployment_list:
+        MOCK_DEPLOYMENTS_PATH.joinpath(deployment).mkdir(parents=True)
 
     # Successful request
     response: Response = client.get("/deployments/")
     assert response.status_code == 200
-    assert response.json() == DEPLOYMENTS_DATA_CONTENT
+    assert set(response.json()) == mock_deployment_list
 
-    # Deployments file does not exist
-    os.remove(MOCK_DEPLOYMENTS_FILE)
-    response = client.get("/deployments/")
-    assert response.status_code == 404
-    assert response.json() == {
-        "detail": "Deployments data does not exist"
-    }
+    rmtree(MOCK_DEPLOYMENTS_PATH)
 
 
 def test_get_deployment() -> None:
-    """Test for getting details of a deployment"""
-    make_fake_deployments_file()
+    """Test for getting database config of a deployment"""
+    make_fake_deployment()
 
     # Successful request
-    response: Response = client.get("/deployments/sample-deployment")
+    response: Response = client.get("/deployments/test-deployment")
     assert response.status_code == 200
-    assert response.json() == DEPLOYMENTS_DATA_CONTENT["sample-deployment"]
+    assert response.json() == MOCK_DB_CONFIG_CONTENT
 
     # Deployment not found
     response = client.get("/deployments/non-existent-deployment")
@@ -132,91 +98,76 @@ def test_get_deployment() -> None:
         "detail": "Deployment does not exist"
     }
 
-    os.remove(MOCK_DEPLOYMENTS_FILE)
+    rmtree(MOCK_DEPLOYMENTS_PATH)
 
 
 def test_update_deployment() -> None:
     """Test for updation of a deployment"""
-    make_fake_deployments_file()
+    make_fake_deployment()
+
     request_json: Dict[str, Any] = {
+        "compose_file": "fake compose file content",
+        "env_file": "BAZ=baz",
         "databases": {
-            "sample-db": {
-                "dbtype": "mongodb",
+            "db2": {
                 "username": "root"
             }
         }
     }
 
     # Successful request
-    with patch("serverctl_deployd.routers.deployments.subprocess.run"):
-        response: Response = client.patch(
-            "/deployments/sample-deployment",
-            json=request_json
-        )
-        assert response.status_code == 200
-        assert response.json() == UPDATED_DATA_CONTENT
-        with open(MOCK_DEPLOYMENTS_FILE, "r", encoding="utf-8") as json_file:
-            json_data = json.load(json_file)
-            deployment_in_file = json_data["sample-deployment"]
-            assert deployment_in_file == UPDATED_DATA_CONTENT
-
-    # Invalid compose file
-    request_json["compose_path"] = MOCK_COMPOSE_FILE
-    with patch(
-        "serverctl_deployd.routers.deployments.subprocess.run",
-        side_effect=CalledProcessError(1, "")
-    ):
-        response = client.patch(
-            "/deployments/sample-deployment",
-            json=request_json
-        )
-        assert response.status_code == 422
-        assert response.json() == {
-            "detail": "Invalid docker-compose file"
-        }
-
-    # Deployment not found
-    with patch("serverctl_deployd.routers.deployments.subprocess.run"):
-        response = client.patch(
-            "/deployments/non-existent-deployment",
-            json=request_json
-        )
-        assert response.status_code == 404
-        assert response.json() == {
-            "detail": "Deployment does not exist"
-        }
-
-    os.remove(MOCK_DEPLOYMENTS_FILE)
-
-
-def test_delete_deployment() -> None:
-    """Test for deletion of a deployment"""
-    make_fake_deployments_file()
-
-    # Successful request
-    response: Response = client.delete("/deployments/sample-deployment")
+    response: Response = client.patch(
+        "/deployments/test-deployment",
+        json=request_json
+    )
     assert response.status_code == 204
-    with open(MOCK_DEPLOYMENTS_FILE, "r", encoding="utf-8") as json_file:
+    compose_file_content = MOCK_COMPOSE_PATH.read_text(encoding="utf-8")
+    assert compose_file_content == request_json["compose_file"]
+    env_file_content = MOCK_ENV_PATH.read_text(encoding="utf-8")
+    assert env_file_content == request_json["env_file"]
+    with open(MOCK_DB_JSON_PATH, "r", encoding="utf-8") as json_file:
         json_data = json.load(json_file)
-        assert "sample-deployment" not in json_data
+        assert json_data == UPDATED_DB_CONFIG_CONTENT
 
     # Deployment not found
-    response = client.delete("/deployments/sample-deployment")
+    response = client.patch(
+        "/deployments/non-existent-deployment",
+        json=request_json
+    )
     assert response.status_code == 404
     assert response.json() == {
         "detail": "Deployment does not exist"
     }
 
-    os.remove(MOCK_DEPLOYMENTS_FILE)
+    rmtree(MOCK_DEPLOYMENTS_PATH)
+
+
+def test_delete_deployment() -> None:
+    """Test for deletion of a deployment"""
+    make_fake_deployment()
+
+    # Successful request
+    response: Response = client.delete("/deployments/test-deployment")
+    assert response.status_code == 204
+    assert not TEST_DEPLOYMENT_PATH.exists()
+
+    # Deployment not found
+    response = client.delete("/deployments/test-deployment")
+    assert response.status_code == 404
+    assert response.json() == {
+        "detail": "Deployment does not exist"
+    }
+
+    rmtree(MOCK_DEPLOYMENTS_PATH)
 
 
 def test_compose_up() -> None:
     """Test for docker-compose down"""
-    make_fake_deployments_file()
+    make_fake_deployment()
 
     # Successful request
     with patch("serverctl_deployd.routers.deployments.subprocess.Popen"):
-        response: Response = client.post("/deployments/sample-deployment/up")
+        response: Response = client.post("/deployments/test-deployment/up")
         assert response.status_code == 200
         assert response.json() == {"message": "docker-compose up executed"}
 
@@ -231,20 +182,20 @@ def test_compose_up() -> None:
         "serverctl_deployd.routers.deployments.subprocess.Popen",
         side_effect=OSError()
     ):
-        response = client.post("/deployments/sample-deployment/up")
+        response = client.post("/deployments/test-deployment/up")
         assert response.status_code == 500
         assert response.json() == {"detail": "Internal server error"}
 
-    os.remove(MOCK_DEPLOYMENTS_FILE)
+    rmtree(MOCK_DEPLOYMENTS_PATH)
 
 
 def test_compose_down() -> None:
     """Test for docker-compose down"""
-    make_fake_deployments_file()
+    make_fake_deployment()
 
     # Successful request
     with patch("serverctl_deployd.routers.deployments.subprocess.Popen"):
-        response: Response = client.post("/deployments/sample-deployment/down")
+        response: Response = client.post("/deployments/test-deployment/down")
         assert response.status_code == 200
         assert response.json() == {"message": "docker-compose down executed"}
 
@@ -259,8 +210,8 @@ def test_compose_down() -> None:
         "serverctl_deployd.routers.deployments.subprocess.Popen",
         side_effect=OSError()
     ):
-        response = client.post("/deployments/sample-deployment/down")
+        response = client.post("/deployments/test-deployment/down")
         assert response.status_code == 500
         assert response.json() == {"detail": "Internal server error"}
 
-    os.remove(MOCK_DEPLOYMENTS_FILE)
+    rmtree(MOCK_DEPLOYMENTS_PATH)
