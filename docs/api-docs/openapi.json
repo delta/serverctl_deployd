@@ -1,0 +1,1906 @@
+{
+    "openapi": "3.0.2",
+    "info": {
+        "title": "FastAPI",
+        "version": "0.1.0"
+    },
+    "paths": {
+        "/config/buckets/": {
+            "post": {
+                "tags": [
+                    "config"
+                ],
+                "summary": "Validate Bucket",
+                "description": "Checks if the directory path and config updation command are valid.\nIf valid then returns a list of files and its hashes",
+                "operationId": "validate_bucket_config_buckets__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ConfigBucket"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "title": "Response Validate Bucket Config Buckets  Post",
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/config/buckets/files": {
+            "post": {
+                "tags": [
+                    "config"
+                ],
+                "summary": "List Filenames",
+                "description": "Return list of file names for a config bucket",
+                "operationId": "list_filenames_config_buckets_files_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ListConfigBucket"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "title": "Response List Filenames Config Buckets Files Post",
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/config/buckets/check": {
+            "post": {
+                "tags": [
+                    "config"
+                ],
+                "summary": "Get Hashes",
+                "description": "Return list of file names for a bucket and their sha256 checksums\nwhich will be verified by the serverctl API",
+                "operationId": "get_hashes_config_buckets_check_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ListConfigBucket"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "title": "Response Get Hashes Config Buckets Check Post",
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/config/buckets/backup": {
+            "post": {
+                "tags": [
+                    "config"
+                ],
+                "summary": "Get Tar Archive",
+                "description": "Returns the tar archive of config folder for backup",
+                "operationId": "get_tar_archive_config_buckets_backup_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ListConfigBucket"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/x-tar": {}
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/config/buckets/file": {
+            "get": {
+                "tags": [
+                    "config"
+                ],
+                "summary": "Get File",
+                "description": "Returns the requested config file",
+                "operationId": "get_file_config_buckets_file_get",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "File Path",
+                            "type": "string",
+                            "format": "file-path"
+                        },
+                        "name": "file_path",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "text/plain": {}
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "config"
+                ],
+                "summary": "Update File",
+                "description": "Updates the requested config file",
+                "operationId": "update_file_config_buckets_file_put",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "File Path",
+                            "type": "string",
+                            "format": "file-path"
+                        },
+                        "name": "file_path",
+                        "in": "query"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Body_update_file_config_buckets_file_put"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "text/plain": {}
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "config"
+                ],
+                "summary": "Delete File",
+                "description": "Deletes the requested config file",
+                "operationId": "delete_file_config_buckets_file_delete",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "File Path",
+                            "type": "string",
+                            "format": "file-path"
+                        },
+                        "name": "file_path",
+                        "in": "query"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateCommand"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "204": {
+                        "description": "Successful Response"
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/deployments/": {
+            "get": {
+                "tags": [
+                    "deployments"
+                ],
+                "summary": "Get Deployments",
+                "description": "Get a list of all deployments",
+                "operationId": "get_deployments_deployments__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "title": "Response Get Deployments Deployments  Get",
+                                    "uniqueItems": true,
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "deployments"
+                ],
+                "summary": "Create Deployment",
+                "description": "Create a deployment",
+                "operationId": "create_deployment_deployments__post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Deployment"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Deployment"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/deployments/{name}": {
+            "get": {
+                "tags": [
+                    "deployments"
+                ],
+                "summary": "Get Deployment",
+                "description": "Get database details of a deployment",
+                "operationId": "get_deployment_deployments__name__get",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Name",
+                            "type": "string"
+                        },
+                        "name": "name",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "title": "Response Get Deployment Deployments  Name  Get",
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "$ref": "#/components/schemas/DBConfig"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "deployments"
+                ],
+                "summary": "Delete Deployment",
+                "description": "Delete a deployment",
+                "operationId": "delete_deployment_deployments__name__delete",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Name",
+                            "type": "string"
+                        },
+                        "name": "name",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Successful Response"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "tags": [
+                    "deployments"
+                ],
+                "summary": "Update Deployment",
+                "description": "Update a deployment",
+                "operationId": "update_deployment_deployments__name__patch",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Name",
+                            "type": "string"
+                        },
+                        "name": "name",
+                        "in": "path"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/UpdateDeployment"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "204": {
+                        "description": "Successful Response"
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/deployments/{name}/up": {
+            "post": {
+                "tags": [
+                    "deployments"
+                ],
+                "summary": "Compose Up",
+                "description": "docker-compose up",
+                "operationId": "compose_up_deployments__name__up_post",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Name",
+                            "type": "string"
+                        },
+                        "name": "name",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "title": "Response Compose Up Deployments  Name  Up Post",
+                                    "type": "object",
+                                    "additionalProperties": {
+                                        "type": "string"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/deployments/{name}/down": {
+            "post": {
+                "tags": [
+                    "deployments"
+                ],
+                "summary": "Compose Down",
+                "description": "docker-compose down",
+                "operationId": "compose_down_deployments__name__down_post",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Name",
+                            "type": "string"
+                        },
+                        "name": "name",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/docker/containers/{container_id}": {
+            "get": {
+                "tags": [
+                    "docker"
+                ],
+                "summary": "Get Container Details",
+                "description": "Get container details",
+                "operationId": "get_container_details_docker_containers__container_id__get",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Container Id",
+                            "type": "string"
+                        },
+                        "name": "container_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ContainerDetails"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/docker/containers/delete": {
+            "post": {
+                "tags": [
+                    "docker"
+                ],
+                "summary": "Delete Container",
+                "description": "Delete container",
+                "operationId": "delete_container_docker_containers_delete_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DeleteRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/docker/containers/{container_id}/start": {
+            "post": {
+                "tags": [
+                    "docker"
+                ],
+                "summary": "Start Container",
+                "description": "Start container",
+                "operationId": "start_container_docker_containers__container_id__start_post",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Container Id",
+                            "type": "string"
+                        },
+                        "name": "container_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/docker/containers/{container_id}/stop": {
+            "post": {
+                "tags": [
+                    "docker"
+                ],
+                "summary": "Stop Container",
+                "description": "Stop container",
+                "operationId": "stop_container_docker_containers__container_id__stop_post",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Container Id",
+                            "type": "string"
+                        },
+                        "name": "container_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/docker/containers/{container_id}/restart": {
+            "post": {
+                "tags": [
+                    "docker"
+                ],
+                "summary": "Restart Container",
+                "description": "Restart container",
+                "operationId": "restart_container_docker_containers__container_id__restart_post",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Container Id",
+                            "type": "string"
+                        },
+                        "name": "container_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/docker/containers/{container_id}/kill": {
+            "post": {
+                "tags": [
+                    "docker"
+                ],
+                "summary": "Kill Container",
+                "description": "Kill container",
+                "operationId": "kill_container_docker_containers__container_id__kill_post",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Container Id",
+                            "type": "string"
+                        },
+                        "name": "container_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/docker/containers/{container_id}/logs": {
+            "get": {
+                "tags": [
+                    "docker"
+                ],
+                "summary": "Get Logs",
+                "description": "Get logs",
+                "operationId": "get_logs_docker_containers__container_id__logs_get",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Container Id",
+                            "type": "string"
+                        },
+                        "name": "container_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LogsResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/docker/containers": {
+            "get": {
+                "tags": [
+                    "docker"
+                ],
+                "summary": "Get Containers",
+                "description": "Get all containers",
+                "operationId": "get_containers_docker_containers_get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "title": "Response Get Containers Docker Containers Get",
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/ContainerDetails"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/docker/images/tag": {
+            "post": {
+                "tags": [
+                    "docker"
+                ],
+                "summary": "Tag Image",
+                "description": "Tag image",
+                "operationId": "tag_image_docker_images_tag_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ImageTagRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/docker/prune": {
+            "post": {
+                "tags": [
+                    "docker"
+                ],
+                "summary": "Prune",
+                "description": "Prune Docker images and containers",
+                "operationId": "prune_docker_prune_post",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PruneRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PruneResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/docker/containers/{container_id}/attach": {
+            "get": {
+                "tags": [
+                    "docker"
+                ],
+                "summary": "Container Attach",
+                "description": "Returns a HTTP Stream for the container's stdout and stderr",
+                "operationId": "container_attach_docker_containers__container_id__attach_get",
+                "parameters": [
+                    {
+                        "required": true,
+                        "schema": {
+                            "title": "Container Id",
+                            "type": "string"
+                        },
+                        "name": "container_id",
+                        "in": "path"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/GenericError"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/": {
+            "get": {
+                "summary": "Root",
+                "description": "Basic route for testing",
+                "operationId": "root__get",
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Body_update_file_config_buckets_file_put": {
+                "title": "Body_update_file_config_buckets_file_put",
+                "required": [
+                    "update_command",
+                    "new_file"
+                ],
+                "type": "object",
+                "properties": {
+                    "update_command": {
+                        "title": "Update Command",
+                        "type": "string"
+                    },
+                    "new_file": {
+                        "title": "New File",
+                        "type": "string",
+                        "format": "binary"
+                    }
+                }
+            },
+            "BuildCachesDeleted": {
+                "title": "BuildCachesDeleted",
+                "type": "object",
+                "properties": {
+                    "CachesDeleted": {
+                        "title": "Cachesdeleted",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Caches deleted"
+                    },
+                    "SpaceReclaimed": {
+                        "title": "Spacereclaimed",
+                        "type": "integer",
+                        "description": "Space reclaimed"
+                    }
+                },
+                "description": "Model for pruned build caches in prune response"
+            },
+            "ConfigBucket": {
+                "title": "ConfigBucket",
+                "type": "object",
+                "properties": {
+                    "directory_path": {
+                        "title": "Directory path for the bucket",
+                        "type": "string",
+                        "description": "This is the path of the directory            in which the config file(s) reside",
+                        "format": "directory-path"
+                    },
+                    "ignore_patterns": {
+                        "title": "List of unix-shell style patterns for files to be ignored",
+                        "uniqueItems": true,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Files which match this pattern will be ignored.            The expressions in this list should follow glob syntax"
+                    },
+                    "update_command": {
+                        "title": "Command to be run to reload the config file(s)",
+                        "type": "string"
+                    }
+                },
+                "description": "Class for validating config bucket creation and updation"
+            },
+            "ContainerDetails": {
+                "title": "ContainerDetails",
+                "required": [
+                    "id",
+                    "name",
+                    "status",
+                    "created"
+                ],
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "title": "Id",
+                        "type": "string",
+                        "description": "Container ID"
+                    },
+                    "name": {
+                        "title": "Name",
+                        "type": "string",
+                        "description": "Container name"
+                    },
+                    "status": {
+                        "title": "Status",
+                        "type": "string",
+                        "description": "Container status"
+                    },
+                    "image": {
+                        "title": "Image",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Image name"
+                    },
+                    "ports": {
+                        "title": "Ports",
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "string"
+                                }
+                            }
+                        },
+                        "description": "Container ports"
+                    },
+                    "created": {
+                        "title": "Created",
+                        "type": "string",
+                        "description": "Container creation time"
+                    }
+                },
+                "description": "Model for container details"
+            },
+            "ContainersDeleted": {
+                "title": "ContainersDeleted",
+                "type": "object",
+                "properties": {
+                    "ContainersDeleted": {
+                        "title": "Containersdeleted",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Containers deleted"
+                    },
+                    "SpaceReclaimed": {
+                        "title": "Spacereclaimed",
+                        "type": "integer",
+                        "description": "Space reclaimed"
+                    }
+                },
+                "description": "Model for pruned containers in prune response"
+            },
+            "DBConfig": {
+                "title": "DBConfig",
+                "required": [
+                    "dbtype",
+                    "username",
+                    "password"
+                ],
+                "type": "object",
+                "properties": {
+                    "dbtype": {
+                        "title": "Type of the database service",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/DBType"
+                            }
+                        ]
+                    },
+                    "username": {
+                        "title": "Username for connecting to database service",
+                        "type": "string"
+                    },
+                    "password": {
+                        "title": "Password for connecting to the database service",
+                        "type": "string"
+                    }
+                },
+                "description": "Class for database config"
+            },
+            "DBType": {
+                "title": "DBType",
+                "enum": [
+                    "mysql",
+                    "mongodb"
+                ],
+                "type": "string",
+                "description": "Enum of supported databases"
+            },
+            "DeleteRequest": {
+                "title": "DeleteRequest",
+                "required": [
+                    "container_id"
+                ],
+                "type": "object",
+                "properties": {
+                    "container_id": {
+                        "title": "Container Id",
+                        "type": "string",
+                        "description": "Container ID"
+                    },
+                    "force": {
+                        "title": "Force",
+                        "type": "boolean",
+                        "description": "Force delete",
+                        "default": false
+                    },
+                    "v": {
+                        "title": "V",
+                        "type": "boolean",
+                        "description": "Remove volumes",
+                        "default": false
+                    }
+                },
+                "description": "Model for delete request"
+            },
+            "Deployment": {
+                "title": "Deployment",
+                "required": [
+                    "name",
+                    "compose_file"
+                ],
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "title": "Name of the deployment",
+                        "type": "string"
+                    },
+                    "compose_file": {
+                        "title": "Content of the docker-compose file",
+                        "type": "string"
+                    },
+                    "env_file": {
+                        "title": "Content of the .env file",
+                        "type": "string"
+                    },
+                    "databases": {
+                        "title": "List of database services",
+                        "type": "object",
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/DBConfig"
+                        }
+                    }
+                },
+                "description": "Class for deployment"
+            },
+            "GenericError": {
+                "title": "GenericError",
+                "required": [
+                    "detail"
+                ],
+                "type": "object",
+                "properties": {
+                    "detail": {
+                        "title": "Detail",
+                        "type": "string"
+                    }
+                },
+                "description": "Model for generic error with detail"
+            },
+            "HTTPValidationError": {
+                "title": "HTTPValidationError",
+                "type": "object",
+                "properties": {
+                    "detail": {
+                        "title": "Detail",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ValidationError"
+                        }
+                    }
+                }
+            },
+            "ImageTagRequest": {
+                "title": "ImageTagRequest",
+                "required": [
+                    "image_id",
+                    "tag"
+                ],
+                "type": "object",
+                "properties": {
+                    "image_id": {
+                        "title": "Image Id",
+                        "type": "string",
+                        "description": "Image ID"
+                    },
+                    "tag": {
+                        "title": "Tag",
+                        "type": "string",
+                        "description": "Image tag"
+                    }
+                },
+                "description": "Model for image tag request"
+            },
+            "ImagesDeleted": {
+                "title": "ImagesDeleted",
+                "type": "object",
+                "properties": {
+                    "ImagesDeleted": {
+                        "title": "Imagesdeleted",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Images deleted"
+                    },
+                    "SpaceReclaimed": {
+                        "title": "Spacereclaimed",
+                        "type": "integer",
+                        "description": "Space reclaimed"
+                    }
+                },
+                "description": "Model for pruned images in prune response"
+            },
+            "ListConfigBucket": {
+                "title": "ListConfigBucket",
+                "required": [
+                    "directory_path"
+                ],
+                "type": "object",
+                "properties": {
+                    "directory_path": {
+                        "title": "Directory path for the bucket",
+                        "type": "string",
+                        "description": "This is the path of the directory            in which the config file(s) reside",
+                        "format": "directory-path"
+                    },
+                    "ignore_patterns": {
+                        "title": "List of unix-shell style patterns for files to be ignored",
+                        "uniqueItems": true,
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Files which match this pattern will be ignored.            The expressions in this list should follow glob syntax"
+                    }
+                },
+                "description": "Class for obtaining list of files for a config bucket"
+            },
+            "LogsResponse": {
+                "title": "LogsResponse",
+                "required": [
+                    "container_id",
+                    "logs"
+                ],
+                "type": "object",
+                "properties": {
+                    "container_id": {
+                        "title": "Container Id",
+                        "type": "string",
+                        "description": "Container ID"
+                    },
+                    "logs": {
+                        "title": "Logs",
+                        "type": "string",
+                        "description": "Logs"
+                    }
+                },
+                "description": "Model for logs response"
+            },
+            "NetworksDeleted": {
+                "title": "NetworksDeleted",
+                "type": "object",
+                "properties": {
+                    "NetworksDeleted": {
+                        "title": "Networksdeleted",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Networks deleted"
+                    }
+                },
+                "description": "Model for pruned networks in prune response"
+            },
+            "PruneRequest": {
+                "title": "PruneRequest",
+                "type": "object",
+                "properties": {
+                    "containers": {
+                        "title": "Containers",
+                        "type": "boolean",
+                        "description": "Delete stopped containers",
+                        "default": false
+                    },
+                    "images": {
+                        "title": "Images",
+                        "type": "boolean",
+                        "description": "Delete unused images",
+                        "default": false
+                    },
+                    "volumes": {
+                        "title": "Volumes",
+                        "type": "boolean",
+                        "description": "Delete unused volumes",
+                        "default": false
+                    },
+                    "networks": {
+                        "title": "Networks",
+                        "type": "boolean",
+                        "description": "Delete unused networks",
+                        "default": false
+                    },
+                    "build_cache": {
+                        "title": "Build Cache",
+                        "type": "boolean",
+                        "description": "Delete the builder cache",
+                        "default": false
+                    },
+                    "all": {
+                        "title": "All",
+                        "type": "boolean",
+                        "description": "Delete stopped containers, unused images, unused volumes,            unused networks and the builder cache",
+                        "default": false
+                    }
+                },
+                "description": "Model for prune request"
+            },
+            "PruneResponse": {
+                "title": "PruneResponse",
+                "type": "object",
+                "properties": {
+                    "containers": {
+                        "$ref": "#/components/schemas/ContainersDeleted"
+                    },
+                    "images": {
+                        "$ref": "#/components/schemas/ImagesDeleted"
+                    },
+                    "networks": {
+                        "$ref": "#/components/schemas/NetworksDeleted"
+                    },
+                    "volumes": {
+                        "$ref": "#/components/schemas/VolumesDeleted"
+                    },
+                    "build_cache": {
+                        "$ref": "#/components/schemas/BuildCachesDeleted"
+                    }
+                },
+                "description": "Model for prune response"
+            },
+            "UpdateCommand": {
+                "title": "UpdateCommand",
+                "required": [
+                    "update_command"
+                ],
+                "type": "object",
+                "properties": {
+                    "update_command": {
+                        "title": "Command to be run to reload the config file(s)",
+                        "type": "string"
+                    }
+                },
+                "description": "Class for update command"
+            },
+            "UpdateDBConfig": {
+                "title": "UpdateDBConfig",
+                "type": "object",
+                "properties": {
+                    "dbtype": {
+                        "title": "Type of the database service",
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/DBType"
+                            }
+                        ]
+                    },
+                    "username": {
+                        "title": "Username for connecting to database service",
+                        "type": "string"
+                    },
+                    "password": {
+                        "title": "Password for connecting to the database service",
+                        "type": "string"
+                    }
+                },
+                "description": "Class for updating database config"
+            },
+            "UpdateDeployment": {
+                "title": "UpdateDeployment",
+                "type": "object",
+                "properties": {
+                    "compose_file": {
+                        "title": "Content of the docker-compose file",
+                        "type": "string"
+                    },
+                    "env_file": {
+                        "title": "Content of the .env file",
+                        "type": "string"
+                    },
+                    "databases": {
+                        "title": "List of database services",
+                        "type": "object",
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/UpdateDBConfig"
+                        }
+                    }
+                },
+                "description": "Class for updating deployment"
+            },
+            "ValidationError": {
+                "title": "ValidationError",
+                "required": [
+                    "loc",
+                    "msg",
+                    "type"
+                ],
+                "type": "object",
+                "properties": {
+                    "loc": {
+                        "title": "Location",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "msg": {
+                        "title": "Message",
+                        "type": "string"
+                    },
+                    "type": {
+                        "title": "Error Type",
+                        "type": "string"
+                    }
+                }
+            },
+            "VolumesDeleted": {
+                "title": "VolumesDeleted",
+                "type": "object",
+                "properties": {
+                    "VolumesDeleted": {
+                        "title": "Volumesdeleted",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        },
+                        "description": "Volumes deleted"
+                    }
+                },
+                "description": "Model for pruned volumes in prune response"
+            }
+        }
+    }
+}
