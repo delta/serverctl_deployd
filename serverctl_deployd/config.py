@@ -4,6 +4,7 @@ Contains the global configuration for the API.
 """
 
 import os
+from pathlib import Path
 from typing import Optional
 
 from dotenv import find_dotenv, load_dotenv
@@ -16,6 +17,8 @@ class Settings(BaseSettings):  # pylint: disable=too-few-public-methods
     """Class for global settings"""
     environment: Optional[str] = os.getenv("ENVIRONMENT")
     log_level: str = os.getenv("LOGLEVEL", "WARNING").upper()
+    deployments_dir: Path = Path(os.getenv("DEPLOYMENTS_DIR",
+                                           ".serverctl/"))
 
 
 settings = Settings()
