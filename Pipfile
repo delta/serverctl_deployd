@@ -15,7 +15,7 @@ python-dotenv = "==0.19.1"
 docker = "==5.0.3"
 python-multipart = "==0.0.5"
 aiofiles = "==0.7.0"
-coverage = {extras = ["toml"], version = "==6.0.2"}
+coverage = {extras = ["toml"], version = "==6.3.2"}
 
 [dev-packages]
 autopep8 = "==1.5.7"
