@@ -18,7 +18,7 @@ aiofiles = "==0.7.0"
 coverage = {extras = ["toml"], version = "==6.0.2"}
 
 [dev-packages]
-autopep8 = "==1.5.7"
+autopep8 = "==1.7.1"
 async-asgi-testclient = "==1.4.6"
 pylint = ">=2.11.1"
 pytest = ">=6.2.5"
